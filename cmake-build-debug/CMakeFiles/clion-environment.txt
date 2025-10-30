@@ -1,0 +1,5 @@
+ToolSet: 12.0 w64 (local)@E:\mingw\x86_64-14.2.0-release-win32-seh-ucrt-rt_v12-rev2\mingw64
+Ninja: 1.12.1@D:\clion\CLion.2025.2.2\bin\ninja\win\x64\ninja.exe
+Options: 
+
+Options:-DCMAKE_MAKE_PROGRAM=D:/clion/CLion.2025.2.2/bin/ninja/win/x64/ninja.exe

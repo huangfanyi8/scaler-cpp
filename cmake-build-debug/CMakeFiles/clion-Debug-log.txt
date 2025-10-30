@@ -1,0 +1,5 @@
+D:\clion\CLion.2025.2.2\bin\cmake\win\x64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=D:/clion/CLion.2025.2.2/bin/ninja/win/x64/ninja.exe -G Ninja -S D:\c++\project\scaler-cpp -B D:\c++\project\scaler-cpp\cmake-build-debug
+-- Include directories: D:/c++/project/scaler-cpp/scaler
+-- Configuring done (1.6s)
+-- Generating done (0.1s)
+-- Build files have been written to: D:/c++/project/scaler-cpp/cmake-build-debug
