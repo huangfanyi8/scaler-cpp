@@ -437,13 +437,27 @@ public slots:
     {
         currentIndex = (currentIndex + 1) % cards.size();
         animateRotation();
+        emit currentIndexChanged(currentIndex);
     }
 
     void rotateCounterClockwise()
     {
         currentIndex = (currentIndex - 1 + cards.size()) % cards.size();
         animateRotation();
+        emit currentIndexChanged(currentIndex);
     }
+
+    void setCurrentIndex(int index)
+    {
+        if (index >= 0 && index < cards.size() && index != currentIndex) {
+            currentIndex = index;
+            animateRotation();
+            emit currentIndexChanged(currentIndex);
+        }
+    }
+
+signals:
+    void currentIndexChanged(int index);
 
 private:
     void animateRotation()
@@ -563,9 +577,15 @@ public:
         titleLabel->setStyleSheet("font-size: 24px; font-weight: bold; margin: 10px; color: #333;");
 
         // 创建轮播图
-        CardCarousel *carousel = new CardCarousel(this);
+        carousel = new CardCarousel(this);
         carousel->setFixedSize(900, 400);
         carousel->setStyleSheet("background: #f5f5f5; border-radius: 10px; border: 1px solid #ddd;");
+
+        // 创建小圆点指示器
+        dotsLayout = new QHBoxLayout();
+        dotsLayout->setAlignment(Qt::AlignCenter);
+        dotsLayout->setSpacing(10);
+        createDots();
 
         // 创建控制按钮
         QHBoxLayout *buttonLayout = new QHBoxLayout();
@@ -607,6 +627,8 @@ public:
         mainLayout->addSpacing(20);
         mainLayout->addWidget(carousel, 1, Qt::AlignCenter);
         mainLayout->addSpacing(10);
+        mainLayout->addLayout(dotsLayout);
+        mainLayout->addSpacing(10);
         mainLayout->addWidget(infoLabel);
         mainLayout->addSpacing(10);
         mainLayout->addLayout(buttonLayout);
@@ -614,6 +636,7 @@ public:
         // 连接信号槽
         connect(leftButton, &QPushButton::clicked, carousel, &CardCarousel::rotateCounterClockwise);
         connect(rightButton, &QPushButton::clicked, carousel, &CardCarousel::rotateClockwise);
+        connect(carousel, &CardCarousel::currentIndexChanged, this, &MainWindow::updateDots);
 
         // 设置窗口属性
         setWindowTitle("Qt6 Card Stack Carousel");
@@ -623,7 +646,78 @@ public:
         centerWindow();
     }
 
+private slots:
+    void updateDots(int index)
+    {
+        for (int i = 0; i < dots.size(); ++i) {
+            if (i == index) {
+                dots[i]->setStyleSheet(
+                    "QPushButton {"
+                    "   background-color: #4CAF50;"
+                    "   border: none;"
+                    "   border-radius: 7px;"
+                    "   width: 14px;"
+                    "   height: 14px;"
+                    "}"
+                );
+            } else {
+                dots[i]->setStyleSheet(
+                    "QPushButton {"
+                    "   background-color: #CCCCCC;"
+                    "   border: none;"
+                    "   border-radius: 7px;"
+                    "   width: 14px;"
+                    "   height: 14px;"
+                    "}"
+                    "QPushButton:hover {"
+                    "   background-color: #AAAAAA;"
+                    "}"
+                );
+            }
+        }
+    }
+
 private:
+    void createDots()
+    {
+        // 创建5个小圆点，对应5张卡牌
+        for (int i = 0; i < 5; ++i) {
+            QPushButton *dot = new QPushButton(this);
+            dot->setFixedSize(14, 14);
+            dot->setCursor(Qt::PointingHandCursor);
+
+            // 设置默认样式
+            if (i == 0) {
+                dot->setStyleSheet(
+                    "QPushButton {"
+                    "   background-color: #4CAF50;"
+                    "   border: none;"
+                    "   border-radius: 7px;"
+                    "}"
+                );
+            } else {
+                dot->setStyleSheet(
+                    "QPushButton {"
+                    "   background-color: #CCCCCC;"
+                    "   border: none;"
+                    "   border-radius: 7px;"
+                    "}"
+                    "QPushButton:hover {"
+                    "   background-color: #AAAAAA;"
+                    "}"
+                );
+            }
+
+            dots.append(dot);
+            dotsLayout->addWidget(dot);
+
+            // 连接点击信号
+            connect(dot, &QPushButton::clicked, [this, i]() {
+                carousel->setCurrentIndex(i);
+            });
+        }
+    }
+
     void centerWindow()
     {
         QRect screenGeometry = QApplication::primaryScreen()->availableGeometry();
@@ -631,6 +725,11 @@ private:
         int y = (screenGeometry.height() - height()) / 2;
         move(x, y);
     }
+
+private:
+    CardCarousel *carousel;
+    QHBoxLayout *dotsLayout;
+    QList<QPushButton*> dots;
 };
 
 int main(int argc, char *argv[])
